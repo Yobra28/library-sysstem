@@ -273,6 +273,7 @@ public class admin_menu extends javax.swing.JFrame {
         }
     }
 
+    
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(() -> new admin_menu().setVisible(true));
     }

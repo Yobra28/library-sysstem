@@ -283,36 +283,47 @@ public class book_borrowing extends javax.swing.JFrame {
     }
 
     private void sendEmailNotification(String userName, String bookId, int days) {
-        String to = getUserEmail(userName); // Get the user's email address
-        String from = "briankuruui3768@gmail.com"; // Your library's email address
-        String smtpHost = System.getenv("SMTP_HOST"); // Your SMTP server
-
-        Properties properties = System.getProperties();
-        properties.setProperty("mail.smtp.host", smtpHost);
-        properties.setProperty("mail.smtp.port", "587");
-        properties.setProperty("mail.smtp.auth", "true");
-        properties.setProperty("mail.smtp.starttls.enable", "true");
-
-        Session session = Session.getDefaultInstance(properties, new javax.mail.Authenticator() {
+        String to = getUserEmail(userName);
+        String from = "itsbrian@gmail.com";
+        
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "465");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+        props.put("mail.smtp.connectiontimeout", "10000");
+        props.put("mail.smtp.timeout", "10000");
+    
+        // Create authenticator with proper credentials
+        Authenticator auth = new Authenticator() {
+            @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("briankuruui3768@gmail.com", " ");
+                return new PasswordAuthentication(
+                    "itsbrian@gmail.com",  // Your full email
+                    "taguerxitegbkegl"     // Correct app password
+                );
             }
-        });
-
+        };
+    
+        Session session = Session.getInstance(props, auth);
+        session.setDebug(true);  // Keep debug enabled
+    
         try {
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(from));
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
             message.setSubject("Book Borrowed Confirmation");
-            message.setText("Dear " + userName + ",\n\nYou have successfully borrowed the book with ID: " + bookId + ".\nThe due date is in " + days + " days.\n\nThank you,\nYour Library");
-
+            message.setText("Dear " + userName + ",\n\nYou have borrowed book ID: " + bookId + 
+                           ".\nDue in " + days + " days.\n\nThank you,\nLibrary");
+    
             Transport.send(message);
-            System.out.println("Sent message successfully....");
+            System.out.println("Email sent successfully!");
         } catch (MessagingException mex) {
+            System.err.println("Email failed to send:");
             mex.printStackTrace();
         }
     }
-
     private String getUserEmail(String userName) {
         // Implement this method to get the user's email address from the student table
         try {

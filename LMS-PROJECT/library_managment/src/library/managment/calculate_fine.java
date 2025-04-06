@@ -164,7 +164,10 @@ public class calculate_fine extends javax.swing.JFrame {
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DBMS_Project", "root", "12345678");
 
             // Query to calculate overdue days and fetch due date and regNo
-            String sql = "SELECT DATEDIFF(CURDATE(), dueDate) AS daysOverdue, dueDate, regNo FROM borrowing_history WHERE userName = ? AND bookId = ?";
+            String sql = "SELECT DATEDIFF(CURDATE(), bh.dueDate) AS daysOverdue, bh.dueDate, s.regNo " +
+                         "FROM borrowing_history bh " +
+                         "JOIN student s ON bh.userName = s.userName " +
+                         "WHERE bh.userName = ? AND bh.bookId = ?";
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setString(1, userName);
             pst.setString(2, bookId);
@@ -177,18 +180,17 @@ public class calculate_fine extends javax.swing.JFrame {
 
                 if (daysOverdue > 0) {
                     int fine = daysOverdue * 10; // Assuming fine is 10 units per day
-                    int option = JOptionPane.showConfirmDialog(null, "Fine for " + userName + " is " + fine + " Kshs. Do you accept the fine?", "Accept Fine", JOptionPane.YES_NO_OPTION);
+                    int option = JOptionPane.showConfirmDialog(null, "Fine for " + userName + " (Reg No: " + regNo + ") is " + fine + " Kshs. Do you accept the fine?", "Accept Fine", JOptionPane.YES_NO_OPTION);
 
                     if (option == JOptionPane.YES_OPTION) {
                         // Insert fine details into the fines table
-                        String insertFineSql = "INSERT INTO fines (userName, regNo, bookId, dueDate, daysOverdue, fine) VALUES (?, ?, ?, ?, ?, ?)";
+                        String insertFineSql = "INSERT INTO fines (userName, bookId, dueDate, daysOverdue, fine) VALUES (?, ?, ?, ?, ?)";
                         PreparedStatement insertPst = con.prepareStatement(insertFineSql);
                         insertPst.setString(1, userName);
-                        insertPst.setString(2, regNo);
-                        insertPst.setString(3, bookId);
-                        insertPst.setString(4, dueDate);
-                        insertPst.setInt(5, daysOverdue);
-                        insertPst.setInt(6, fine);
+                        insertPst.setString(2, bookId);
+                        insertPst.setString(3, dueDate);
+                        insertPst.setInt(4, daysOverdue);
+                        insertPst.setInt(5, fine);
 
                         int rowsInserted = insertPst.executeUpdate();
                         if (rowsInserted > 0) {

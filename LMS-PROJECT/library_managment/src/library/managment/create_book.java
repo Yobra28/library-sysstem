@@ -275,8 +275,8 @@ public class create_book extends javax.swing.JFrame {
         String pagesText = jTextField6.getText();
         String bAuth = jTextField7.getText();
         String bPub = jTextField8.getText();
-        String rackNo = (String) jComboBox1.getSelectedItem() + "-" + (String) jComboBox2.getSelectedItem() + "-" + (String) jComboBox3.getSelectedItem();
-        
+        String rackNumber = (String) jComboBox1.getSelectedItem() + "-" + (String) jComboBox2.getSelectedItem() + "-" + (String) jComboBox3.getSelectedItem();
+
         // Validate input fields
         if (bookId.isEmpty() || bName.isEmpty() || category.isEmpty() || pagesText.isEmpty() || bAuth.isEmpty() || bPub.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Fields are empty");
@@ -293,11 +293,13 @@ public class create_book extends javax.swing.JFrame {
 
         try {
             Class.forName("java.sql.DriverManager");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DBMS_Project", "root", "");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DBMS_Project", "root", "12345678");
             Statement stmt = con.createStatement();
-            String q = "insert into lib_book (bookId, bookName, category, pages, rackNo, authorName, publisherName) values('" + bookId + "','" + bName + "','" + category + "'," + pages + ",'" + rackNo + "','" + bAuth + "','" + bPub + "', true)";
+            String q = "INSERT INTO lib_book (bookId, bookName, category, pages, rackNumber, authorName, publisherName) VALUES ('" + bookId + "','" + bName + "','" + category + "'," + pages + ",'" + rackNumber + "','" + bAuth + "','" + bPub + "')";
             stmt.executeUpdate(q);
             JOptionPane.showMessageDialog(this, "NEW BOOK HAS BEEN ADDED");
+
+            // Clear input fields
             jTextField1.setText("");
             jTextField3.setText("");
             jTextField5.setText("");
@@ -307,7 +309,7 @@ public class create_book extends javax.swing.JFrame {
             jComboBox1.setSelectedIndex(0);
             jComboBox2.setSelectedIndex(0);
             jComboBox3.setSelectedIndex(0);
-            
+
         } catch (Exception x) {
             JOptionPane.showMessageDialog(this, x.getMessage());
         }

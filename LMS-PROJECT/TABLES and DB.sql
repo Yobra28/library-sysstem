@@ -52,3 +52,13 @@ CREATE TABLE IF NOT EXISTS fines (
     fine DECIMAL(10, 2) NOT NULL,
     FOREIGN KEY (userName) REFERENCES student(userName)
 );
+CREATE TABLE fines_table (
+    userName VARCHAR(50) NOT NULL,
+    bookId VARCHAR(50) NOT NULL,
+    dueDate DATE NOT NULL,
+    daysOverdue INT NOT NULL,
+    fine INT NOT NULL,
+    PRIMARY KEY (userName, bookId), -- Prevent duplicate fines for the same user and book
+    FOREIGN KEY (userName) REFERENCES student(userName),
+    FOREIGN KEY (bookId) REFERENCES lib_book(bookId)
+);
